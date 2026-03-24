@@ -1,5 +1,5 @@
 import "@plasmohq/messaging/background";
-import { upload_cookie, download_cookie, load_data, save_data, sleep } from '../function';
+import { upload_cookie, download_cookie, load_data, save_data, sleep, bidirectional_sync } from '../function';
 import browser from 'webextension-polyfill';
 
 export const life = 42
@@ -54,20 +54,31 @@ browser.alarms.onAlarm.addListener( async a =>
                 if( parseInt(config.interval) < 1 || minute_count % config.interval == 0 )
                 {
                     // 开始同步
-                    console.log(`同步时间到 ${minute_count} ${config.interval}`);
+                    console.log(`同步时间到 ${minute_count} ${config.interval} - 模式: ${config.type || 'up'}`);
+
                     if(config.type && config.type == 'down')
                     {
                         // 从服务器取得cookie，向本地写入cookie
                         const result = await download_cookie(config);
-                        if( result && result['action'] == 'done' ) 
+                        if( result && result['action'] == 'done' )
                             console.log("下载覆盖成功");
                         else
                             console.log( result );
-                    }else
+                    }
+                    else if(config.type && config.type == 'sync')
                     {
-                        
+                        // 双向同步：先上传本地有变化的数据，然后下载并合并
+                        const result = await bidirectional_sync(config);
+                        if( result && result.success )
+                            console.log("双向同步成功", result.merge_summary);
+                        else
+                            console.log("双向同步失败", result );
+                    }
+                    else
+                    {
+                        // 上传模式（默认）
                         const result = await upload_cookie(config);
-                        if( result && result['action'] == 'done' ) 
+                        if( result && result['action'] == 'done' )
                             console.log("上传成功");
                         else
                             console.log( result );

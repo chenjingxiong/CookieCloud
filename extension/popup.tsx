@@ -97,6 +97,7 @@ function IndexPopup() {
         <label className="mr-2"><input type="radio" name="type" value="up" checked={data['type'] == 'up'} onChange={e=>onChange('type',e)} /> {browser.i18n.getMessage('upToServer')}</label>
         <label className="mr-2"><input type="radio" name="type" value="down" checked={data['type'] == 'down'} onChange={e=>onChange('type',e)} /> {browser.i18n.getMessage('overwriteToBrowser')}
         </label>
+        <label className="mr-2"><input type="radio" name="type" value="sync" checked={data['type'] == 'sync'} onChange={e=>onChange('type',e)} /> 双向同步</label>
         <label className="mr-2"><input type="radio" name="type" value="pause" checked={data['type'] == 'pause'} onChange={e=>onChange('type',e)} /> {browser.i18n.getMessage('pauseSync')}</label>
         
         </div>
@@ -104,6 +105,19 @@ function IndexPopup() {
         {data['type'] && data['type'] == 'down' && <div className="bg-red-600 text-white p-2 my-2 rounded">
         {browser.i18n.getMessage('overwriteModeDesp')}
         </div>}
+
+        {data['type'] && data['type'] == 'sync' && <div className="bg-purple-600 text-white p-2 my-2 rounded">
+        双向同步模式：智能合并本地和服务器的 cookie 数据，取最新的有效数据
+        </div>}
+
+        {data['type'] && data['type'] == 'sync' && <>
+        <div className="">合并策略</div>
+        <div className="my-2">
+        <label className="mr-2"><input type="radio" name="merge_strategy" value="newest" checked={!data['merge_strategy'] || data['merge_strategy'] == 'newest'} onChange={e=>onChange('merge_strategy',e)} /> 取最新（推荐）</label>
+        <label className="mr-2"><input type="radio" name="merge_strategy" value="local" checked={data['merge_strategy'] == 'local'} onChange={e=>onChange('merge_strategy',e)} /> 优先本地</label>
+        <label className="mr-2"><input type="radio" name="merge_strategy" value="remote" checked={data['merge_strategy'] == 'remote'} onChange={e=>onChange('merge_strategy',e)} /> 优先远程</label>
+        </div>
+        </>}
         
         {data['type'] && data['type'] != 'pause' && <>
         <div className="">{browser.i18n.getMessage('serverHost')}</div>
